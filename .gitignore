@@ -6,6 +6,9 @@
 # Mac junk
 .DS_Store
 
+# my junk
+stateLog/
+
 # User-specific files
 *.suo
 *.user
