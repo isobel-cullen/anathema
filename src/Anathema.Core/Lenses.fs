@@ -1,27 +1,22 @@
 module Anathema.Core.Lenses
 
 open Aether
-
-open Anathema.Core.Components
 open Anathema.Core.Entities
-
-type Entity with
-    static member LensFor<'t when 't :> Component> (index) =
-        (fun (e: Entity) -> e.Get<'t>(index)),
-        (fun (p: 't) (e: Entity) -> e.With(index, p)) 
 
 [<AutoOpen>]
 module private Components =
-    let agency = Entity.LensFor<Agency>(Component.Agency)
-    let position = Entity.LensFor<Position>(Component.Position)
-    let visibility = Entity.LensFor<Visibility>(Component.Visibility)
+    let agencyLens = (fun (e: Entity) -> e.Agency), (fun a e -> { e with Agency = a |> Some })
+    let positionLens = (fun (e: Entity) -> e.Position), (fun a e -> { e with Position = a |> Some })
+    let visibilityLens = (fun (e: Entity) -> e.Visible), (fun a e -> { e with Visible = a |> Some })
 
-module Get =
-    let agency = Optic.get agency
-    let position = Optic.get position
-    let visibility = Optic.get visibility
+[<AutoOpen>]
+module Getters = 
+    let agency = Optic.get agencyLens
+    let position = Optic.get positionLens
+    let visibility = Optic.get visibilityLens
 
-module Set =
-    let agency = Optic.set agency
-    let position = Optic.set position
-    let visibility = Optic.set visibility
+[<AutoOpen>]
+module Setters = 
+    let setAgency = Optic.set agencyLens
+    let setPosition = Optic.set positionLens
+    let setVisibility = Optic.set visibilityLens

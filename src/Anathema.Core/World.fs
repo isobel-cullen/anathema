@@ -24,7 +24,7 @@ type World (resumeFromState) =
 
     let rec getActions (state: WorldState) =
         let entity = state.CurrentEntity
-        match Get.agency entity with
+        match agency entity with
         | Some agency -> 
             match agency.Energy >= 100 with
             | true ->
@@ -39,9 +39,9 @@ type World (resumeFromState) =
                     { state with ActionQueue = state.ActionQueue.Enqueue actionWithId }
                 | _ -> state
             | _ ->
-                // TODO: figure out how to make components immutable
-                agency.Energy <- agency.Energy + agency.Speed
-                state 
+                entity 
+                    |> setAgency { agency with Energy = agency.Energy + agency.Speed } 
+                    |> state.Replace
         | _ -> getActions (state.AdvanceEntityCounter ())
 
     let run = getActions >> doActions

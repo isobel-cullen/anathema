@@ -9,9 +9,8 @@ let perform (world: WorldState) (action: Action) =
     match action.Type with
     | Move dir -> 
         let entity = world.Entities.[action.EntityId]
-        match Get.position entity with
+        match position entity with
         | None -> world
         | Some pos ->
-            world.Replace 
-                (entity |> Set.position (Position (pos.Pos + dir.ToPoint())))
+            world.Replace (entity |> setPosition (pos + dir.ToPoint()))
     | _ -> world
