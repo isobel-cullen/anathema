@@ -20,8 +20,8 @@ let getView (state : WorldState) =
     state.Entities
             |> Seq.filter (fun kv -> kv.Value.IsEnabled)
             |> Seq.map (fun kv -> kv.Value)
-            |> Seq.choose2 (Get.position) (Get.visibility)
-            |> Seq.map (fun (p,v) -> KeyValuePair((p.Pos.X, p.Pos.Y), v.Symbol))
+            |> Seq.choose2 (position) (visibility)
+            |> Seq.map (fun (p,v) -> KeyValuePair((p.X, p.Y), v.Symbol))
             |> ImmutableDictionary.CreateRange
 
 let keyToDirection (key: KeyEvent) =
@@ -70,9 +70,9 @@ type Arena (state: WorldState ref, setPlayerAction: Foundation.Action -> unit) =
 let main argv =
 
     let player = Entity.Create(0L) 
-                    |> Set.agency (PlayerControlled())
-                    |> Set.position (Position Point.One)
-                    |> Lenses.Set.visibility (Visibility('@'))
+                    |> setAgency (Agency.Player)
+                    |> setPosition Point.One
+                    |> setVisibility ({Symbol = '@'})
 
     let mutable world = WorldState.Empty.Register player
     let state = World world
