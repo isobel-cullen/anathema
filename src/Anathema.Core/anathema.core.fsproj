@@ -13,7 +13,6 @@
     <Compile Include="Foundation.fs" />
     <Compile Include="Components/Component.fs" />
     <Compile Include="Entities/Entities.fs" />
-    <Compile Include="Entities/Accessors.fs" />
     <Compile Include="WorldState.fs" />
     <Compile Include="Lenses.fs" />
     <Compile Include="Systems/Agency.fs" />
