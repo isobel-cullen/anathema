@@ -12,7 +12,6 @@ open Anathema.Core.Lenses
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Foundation
 open Terminal.Gui
-open NStack
 
 type KeyActionChooser = Key -> Action option
 
@@ -24,12 +23,12 @@ let getView (state : WorldState) =
             |> Seq.map (fun (p,v) -> KeyValuePair((p.X, p.Y), v.Symbol))
             |> ImmutableDictionary.CreateRange
 
-let keyToDirection (key: KeyEvent) =
-    let tryToChar k =
-        if k >= int Char.MinValue && k <= int Char.MaxValue then
-            Convert.ToChar k |> Some
-        else None 
+let tryToChar k =
+    if k >= int Char.MinValue && k <= int Char.MaxValue then
+        Convert.ToChar k |> Some
+    else None 
 
+let keyToDirection (key: KeyEvent) =
     match key.Key, tryToChar key.KeyValue with
     | _, Some 'h' | Key.CursorLeft, _   -> Direction.West  |> Some
     | _, Some 'j' | Key.CursorDown, _   -> Direction.South |> Some
@@ -52,7 +51,12 @@ type Arena (state: WorldState ref, setPlayerAction: Foundation.Action -> unit) =
                     Type = Foundation.Move direction 
                 } |> setPlayerAction
                 true
-            | _ -> false
+            | _ -> 
+                match tryToChar (key.KeyValue) with
+                | Some 'q' -> 
+                    Application.RequestStop() 
+                    false
+                | _ -> false
 
         override this.Redraw (rect) =
             this.Clear()
