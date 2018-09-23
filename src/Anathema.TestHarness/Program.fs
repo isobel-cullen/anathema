@@ -15,7 +15,7 @@ open Terminal.Gui
 
 type KeyActionChooser = Key -> Action option
 
-let getView (state : WorldState) = 
+let getView (state : WorldState) =
     state.Entities
             |> Seq.filter (fun kv -> kv.Value.IsEnabled)
             |> Seq.map (fun kv -> kv.Value)
@@ -26,7 +26,7 @@ let getView (state : WorldState) =
 let tryToChar k =
     if k >= int Char.MinValue && k <= int Char.MaxValue then
         Convert.ToChar k |> Some
-    else None 
+    else None
 
 let keyToDirection (key: KeyEvent) =
     match key.Key, tryToChar key.KeyValue with
@@ -34,27 +34,27 @@ let keyToDirection (key: KeyEvent) =
     | _, Some 'j' | Key.CursorDown, _   -> Direction.South |> Some
     | _, Some 'k' | Key.CursorUp, _     -> Direction.North |> Some
     | _, Some 'l' | Key.CursorRight, _  -> Direction.East  |> Some
-    | _, Some 'u'                       -> Direction.NorthWest |> Some
-    | _, Some 'i'                       -> Direction.NorthEast |> Some
+    | _, Some 'y'                       -> Direction.NorthWest |> Some
+    | _, Some 'u'                       -> Direction.NorthEast |> Some
     | _, Some 'b'                       -> Direction.SouthWest |> Some
     | _, Some 'n'                       -> Direction.SouthEast |> Some
     | _, _                              -> None
 
-type Arena (state: WorldState ref, setPlayerAction: Foundation.Action -> unit) =
+type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
     inherit View(Rect(0,0,80,25)) with
         override this.ProcessKey key =
             match key |> keyToDirection with
-            | Some direction -> 
+            | Some direction ->
                 { 
-                    EntityId = 0L; 
-                    Cost = 20
-                    Type = Foundation.Move direction 
+                    EntityId = 0L;
+                    Cost = 50
+                    Type = Move direction
                 } |> setPlayerAction
                 true
             | _ -> 
                 match tryToChar (key.KeyValue) with
                 | Some 'q' -> 
-                    Application.RequestStop() 
+                    Application.RequestStop()
                     false
                 | _ -> false
 
@@ -73,12 +73,22 @@ type Arena (state: WorldState ref, setPlayerAction: Foundation.Action -> unit) =
 [<EntryPoint>]
 let main argv =
 
-    let player = Entity.Create(0L) 
+    let player = Entity.Empty
                     |> setAgency (Agency.Player)
                     |> setPosition Point.One
-                    |> setVisibility ({Symbol = '@'})
+                    |> setVisibility {Symbol = '@'}
+
+    let monster = Entity.Empty
+                    |> setAgency (Agency.Wandering)
+                    |> setPosition ({X=10;Y=15})
+                    |> setVisibility {Symbol='m'}
+
+    let monster2 = { monster with Position = Some {X=2;Y=1}}
 
     let mutable world = WorldState.Empty.Register player
+    world <- world.Register monster
+    world <- world.Register monster2
+
     let state = World world
     let stateLogger = StateAgent.getStateLogger()
 

@@ -20,6 +20,7 @@ type Agency = {
     }
 
     static member Player = { Agency.Default with RequiresInput = true; Speed = 10 }
+    static member Wandering = { Agency.Default with Behaviour = (Some Wandering); Speed = 10 }
 
 type Visible = {
     Symbol: char
