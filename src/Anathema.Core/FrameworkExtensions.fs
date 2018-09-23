@@ -7,3 +7,12 @@ module Seq =
             | None, _
             | _, None -> None
             | Some l, Some r -> Some (l, r))
+
+
+module Map =
+    let chooseValues chooser (map: Map<'k,'v>) =
+        seq { for kv in map do
+                match chooser (kv.Value) with
+                | Some value -> yield value
+                | None -> ()
+            }

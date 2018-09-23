@@ -22,6 +22,3 @@ type Entity = {
         Visible = None
         Position = None
     }
-
-    static member Create id =
-        { Entity.Empty with Id = id; } 

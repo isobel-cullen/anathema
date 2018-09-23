@@ -11,13 +11,13 @@
   <ItemGroup>
     <Compile Include="FrameworkExtensions.fs" />
     <Compile Include="Foundation.fs" />
+    <Compile Include="Actions.fs" />
     <Compile Include="Components/Component.fs" />
     <Compile Include="Entities/Entities.fs" />
     <Compile Include="WorldState.fs" />
     <Compile Include="Lenses.fs" />
     <Compile Include="Systems/Agency.fs" />
     <Compile Include="Systems/Movement.fs" />
-    <Compile Include="Actions.fs" />
     <Compile Include="World.fs" />
   </ItemGroup>
   <ItemGroup>

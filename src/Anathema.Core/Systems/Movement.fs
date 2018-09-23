@@ -1,6 +1,7 @@
 module Anathema.Core.Systems.Movement
 
 open Anathema.Core
+open Anathema.Core.Actions
 open Anathema.Core.Entities
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Foundation
@@ -18,17 +19,18 @@ module Impl =
        | { Y = 25 } -> false
        | _ -> true
 
-    let isBlocked (state: WorldState) (point: Point) (direction: Direction) =
+    let isNotBlocked (state: WorldState) (point: Point) (direction: Direction) =
         let prospectivePosision = point + (direction.ToPoint())
         state.Entities
             |> Map.chooseValues (position)
             |> Seq.exists ((=) prospectivePosision)
+            |> not
 
 let isMoveValid (state: WorldState) (position: Point) (direction: Direction) =
     [
         isWithinBounds
-        isBlocked
-    ] |> List.exists (fun check -> check state position direction)
+        isNotBlocked
+    ] |> List.forall (fun check -> check state position direction)
 
 let perform (world: WorldState) (action: Action) =
     match action.Type with

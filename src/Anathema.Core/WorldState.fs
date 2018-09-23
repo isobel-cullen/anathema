@@ -2,6 +2,7 @@ namespace Anathema.Core
 
 open System.Collections.Immutable
 
+open Anathema.Core.Actions
 open Anathema.Core.Entities
 open Anathema.Core.Foundation
 
@@ -45,6 +46,7 @@ type WorldState = {
         __.Entities.[id]
 
     member __.AdvanceEntityCounter () =
-        match __.EntityCounter, __.Entities.Count with
+        let nextCounter = __.EntityCounter + 1
+        match nextCounter, __.Entities.Count with
         | c,ec when c >= ec -> { __ with EntityCounter = 0 }
-        | c, _ -> { __ with EntityCounter = c + 1 }
+        | c, _ -> { __ with EntityCounter = nextCounter }
