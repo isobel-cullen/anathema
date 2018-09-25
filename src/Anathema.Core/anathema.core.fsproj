@@ -17,6 +17,7 @@
     <Compile Include="WorldState.fs" />
     <Compile Include="Lenses.fs" />
     <Compile Include="Systems/Agency.fs" />
+    <Compile Include="Systems/EntityBuilder.fs" />
     <Compile Include="Systems/Movement.fs" />
     <Compile Include="World.fs" />
   </ItemGroup>
