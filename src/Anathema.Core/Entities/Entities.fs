@@ -13,9 +13,9 @@ type Entity = {
     // Components
     Agency: Agency option
     Visible: Visible option
-    Position: Point option
+    Position: Position option
 } with 
-    static member Empty = {
+    static member Default = {
         Id = 0L
         IsEnabled = false
         Agency = None

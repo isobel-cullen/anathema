@@ -11,6 +11,9 @@ open Anathema.Core.Entities
 open Anathema.Core.Lenses
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Foundation
+open Anathema.Core.Systems
+open Terminal.Gui
+open NStack
 open Terminal.Gui
 
 type KeyActionChooser = Key -> Action option
@@ -20,7 +23,8 @@ let getView (state : WorldState) =
             |> Seq.filter (fun kv -> kv.Value.IsEnabled)
             |> Seq.map (fun kv -> kv.Value)
             |> Seq.choose2 (position) (visibility)
-            |> Seq.map (fun (p,v) -> KeyValuePair((p.X, p.Y), v.Symbol))
+            |> Seq.filter (fun (p,v) -> p.Exclusive)
+            |> Seq.map (fun (p,v) -> KeyValuePair((p.Coord.X, p.Coord.Y), v.Symbol))
             |> ImmutableDictionary.CreateRange
 
 let tryToChar k =
@@ -41,7 +45,7 @@ let keyToDirection (key: KeyEvent) =
     | _, _                              -> None
 
 type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
-    inherit View(Rect(0,0,80,25)) with
+    inherit View(Rect(0,0,60,25)) with
         override this.ProcessKey key =
             match key |> keyToDirection with
             | Some direction ->
@@ -59,31 +63,34 @@ type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
                 | _ -> false
 
         override this.Redraw (rect) =
-            this.Clear()
+            base.Redraw(rect)
+
             let view = getView (! state)
-            for x in 0 .. 79 do
+            for x in 0 .. 59 do
                 for y in 0 .. 24 do
-                    match view.TryGetValue ((x,y)) with 
+                    match view.TryGetValue ((x,y)) with
                     | true, ch -> this.AddRune (x, y, Rune ch)
                     | false, _ -> this.AddRune (x, y, Rune '.')
-            ()
 
         override this.CanFocus = true
 
+
 [<EntryPoint>]
 let main argv =
+    let schema = ColorScheme()
+    schema.Normal <- Attribute(0)
 
-    let player = Entity.Empty
+    let player = Entity.Default
                     |> setAgency (Agency.Player)
-                    |> setPosition Point.One
-                    |> setVisibility {Symbol = '@'}
+                    |> setPosition ({ Position.Actor with Coord = Point.Zero})
+                    |> setVisibility ({ Visible.Actor with Symbol = '@' })
 
-    let monster = Entity.Empty
+    let monster = Entity.Default
                     |> setAgency (Agency.Wandering)
-                    |> setPosition ({X=10;Y=15})
-                    |> setVisibility {Symbol='m'}
+                    |> setPosition ({ Position.Actor with Coord = {X=10;Y=15} })
+                    |> setVisibility ({ Visible.Actor with Symbol='m' })
 
-    let monster2 = { monster with Position = Some {X=2;Y=1}}
+    let monster2 = monster |> setPosition { Position.Actor with Coord = {X=0;Y=1}}
 
     let mutable world = WorldState.Empty.Register player
     world <- world.Register monster
@@ -93,18 +100,28 @@ let main argv =
     let stateLogger = StateAgent.getStateLogger()
 
     let rWorld = ref world
-    let arena = Arena (rWorld, state.SetNextAction) 
+    let arena = Arena (rWorld, state.SetNextAction)
 
     Application.Init()
     let top = Application.Top
     top.Add arena
 
+    let label = Label(60,24, "Label" |> ustring.Make)
+    label.ColorScheme <- schema
+    top.Add label
+
+    let clock = System.Diagnostics.Stopwatch.StartNew()
     let setState e =
         let nextState = state.Process()
         if Object.ReferenceEquals(! rWorld, nextState) |> not then
+            clock.Restart()
+
             rWorld := nextState
             top.SetNeedsDisplay()
             stateLogger.Post nextState
+
+            label.Text <- (sprintf "%d" clock.ElapsedMilliseconds |> ustring.Make)
+            label.SetNeedsDisplay()
 
     Application.Iteration.Add setState
     Application.Run top
