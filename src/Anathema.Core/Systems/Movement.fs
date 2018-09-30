@@ -2,32 +2,32 @@ module Anathema.Core.Systems.Movement
 
 open Anathema.Core
 open Anathema.Core.Actions
-open Anathema.Core.Entities
-open Anathema.Core.FrameworkExtensions
-open Anathema.Core.Foundation
 open Anathema.Core.Components
+open Anathema.Core.Foundation
+open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
 
 [<AutoOpen>]
 module Impl =
-    // consider calculating the new point prior to calling each checking function?
-    let isWithinBounds (state: WorldState) (position: Position) (direction: Direction) =
-       match position.Coord + (direction.ToPoint()) with
-       | { X = -1 }
-       | { X = 80 }
-       | { Y = -1 }
-       | { Y = 25 } -> false
+    /// TODO: This will need fixed when the arena becomes larger than the
+    /// visible area.
+    let isWithinBounds _ position (direction: Direction) =
+       match position.Coord ++ (Point.fromDirection direction) with
+       | -1, _
+       | 80, _
+       | _, -1
+       | _, 25 -> false
        | _ -> true
 
-    let isNotBlocked (state: WorldState) (point: Position) (direction: Direction) =
-        let prospectivePosision = point.Coord + (direction.ToPoint())
+    let isNotBlocked (state: WorldState) point (direction: Direction) =
+        let prospectivePosision = point.Coord ++ (Point.fromDirection direction)
         state.Entities
             |> Map.chooseValues position
             |> Seq.filter (fun p -> p.Exclusive)
             |> Seq.exists (fun p -> p.Coord = prospectivePosision)
             |> not
 
-let isMoveValid (state: WorldState) (position: Position) (direction: Direction) =
+let isMoveValid (state: WorldState) position (direction: Direction) =
     [
         isWithinBounds
         isNotBlocked
@@ -42,7 +42,7 @@ let perform (world: WorldState) (action: Action) =
         | Some pos ->
             match isMoveValid world pos dir with
             | true ->
-                let newPosition ={ pos with Coord = pos.Coord + dir.ToPoint() }
+                let newPosition ={ pos with Coord = pos.Coord ++ Point.fromDirection dir }
                 world.Replace (entity |> setPosition newPosition)
             | false -> world
     | _ -> world

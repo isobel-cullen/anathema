@@ -36,9 +36,9 @@ type World (resumeFromState) =
             match agency |> canAct, agency.RequiresInput, nextPlayerAction with
             | false, _, _ ->
                 entity 
-                    |> setAgency (energise agency) 
+                    |> setAgency (energise agency)
                     |> state.Replace 
-                    |> advance 
+                    |> advance
                     |> getActions
             | true, false, _ ->
                 match Systems.Agency.getAction state agency with

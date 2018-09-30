@@ -10,9 +10,17 @@ module Seq =
 
 
 module Map =
+    /// return values where th
     let chooseValues chooser (map: Map<'k,'v>) =
         seq { for kv in map do
                 match chooser (kv.Value) with
                 | Some value -> yield value
+                | None -> ()
+            }
+
+    let chooseItemsWith chooser (map: Map<'k, 'v>) =
+        seq { for kv in map do
+                match chooser (kv.Value) with
+                | Some _ -> yield kv.Value
                 | None -> ()
             }

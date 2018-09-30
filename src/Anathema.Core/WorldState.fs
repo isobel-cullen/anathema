@@ -3,7 +3,7 @@ namespace Anathema.Core
 open System.Collections.Immutable
 
 open Anathema.Core.Actions
-open Anathema.Core.Entities
+open Anathema.Core
 open Anathema.Core.Foundation
 
 type WorldState = {
