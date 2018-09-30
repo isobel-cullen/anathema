@@ -1,12 +1,7 @@
 ﻿namespace Anathema.Core.Foundation
 
-type Point = { X: int; Y: int } with
-    static member Zero = { X=0; Y=0 }
-    static member One = { X=1; Y=1 }
-    static member (+) (l,r) = { X = l.X + r.X; Y = l.Y + r.Y }
-    static member (-) (l,r) = { X = l.X - r.X; Y = l.Y - r.Y }
-
 type Direction =
+| Centre
 | North
 | NorthEast
 | East
@@ -15,26 +10,37 @@ type Direction =
 | SouthWest
 | West
 | NorthWest
-    member this.ToPoint () =
-            match this with
-            | North         -> { X = 0; Y = -1 }
-            | NorthEast     -> { X = 1; Y = -1 }
-            | East          -> { X = 1; Y = 0 }
-            | SouthEast     -> { X = 1; Y = 1 }
-            | South         -> { X = 0; Y = 1 }
-            | SouthWest     -> { X = -1; Y = 1 }
-            | West          -> { X = -1; Y = 0 }
-            | NorthWest     -> { X = -1; Y = -1 }
-
     static member Random () =
         let rng = System.Random()
-        match rng.Next(0,8) with
-        | 0 -> North
-        | 1 -> NorthEast
-        | 2 -> East
-        | 3 -> SouthEast
-        | 4 -> South
-        | 5 -> SouthWest
-        | 6 -> West
-        | 7 -> NorthWest
+        match rng.Next(0,9) with
+        | 0 -> Centre
+        | 1 -> North
+        | 2 -> NorthEast
+        | 3 -> East
+        | 4 -> SouthEast
+        | 5 -> South
+        | 6 -> SouthWest
+        | 7 -> West
+        | 8 -> NorthWest
         | _ -> failwith "impossible"
+
+type Point = int * int
+module Point =
+    let zero = 0,0
+    let one = 1,1
+
+    let fromDirection = function
+        | Centre        -> 0,0
+        | North         -> 0,-1
+        | NorthEast     -> 1,-1
+        | East          -> 1,0
+        | SouthEast     -> 1,1
+        | South         -> 0,1
+        | SouthWest     -> -1,1
+        | West          -> -1,0
+        | NorthWest     -> -1,-1
+
+[<AutoOpen>]
+module Operators =
+    let inline (++) (x1: int ,y1: int) (x2,y2) = (x1 + x2), (y1 + y2)
+    let inline (--) (x1: int, y1: int) (x2,y2) = (x1 - x2), (y1 - y2)

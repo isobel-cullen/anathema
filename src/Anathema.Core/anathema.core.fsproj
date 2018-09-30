@@ -11,17 +11,18 @@
   <ItemGroup>
     <Compile Include="FrameworkExtensions.fs" />
     <Compile Include="Foundation.fs" />
-    <Compile Include="Actions.fs" />
+    <Compile Include="Components/Agency.fs" />
+    <Compile Include="Components/Positionable.fs" />
     <Compile Include="Components/Component.fs" />
-    <Compile Include="Entities/Entities.fs" />
+    <Compile Include="Components/Interactablefs.fs" />
+    <Compile Include="Entity.fs" />
+    <Compile Include="Actions.fs" />
     <Compile Include="WorldState.fs" />
     <Compile Include="Lenses.fs" />
     <Compile Include="Systems/Agency.fs" />
     <Compile Include="Systems/EntityBuilder.fs" />
     <Compile Include="Systems/Movement.fs" />
     <Compile Include="World.fs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="Aether" Version="8.2.0" />
   </ItemGroup>

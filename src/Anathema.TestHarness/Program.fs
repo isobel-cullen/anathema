@@ -7,7 +7,6 @@ open System.Collections.Immutable
 open Anathema.Core
 open Anathema.Core.Actions
 open Anathema.Core.Components
-open Anathema.Core.Entities
 open Anathema.Core.Lenses
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Foundation
@@ -18,13 +17,15 @@ open Terminal.Gui
 
 type KeyActionChooser = Key -> Action option
 
+let (!!) (s: string) = ustring.Make s
+
 let getView (state : WorldState) =
     state.Entities
             |> Seq.filter (fun kv -> kv.Value.IsEnabled)
             |> Seq.map (fun kv -> kv.Value)
-            |> Seq.choose2 (position) (visibility)
-            |> Seq.filter (fun (p,v) -> p.Exclusive)
-            |> Seq.map (fun (p,v) -> KeyValuePair((p.Coord.X, p.Coord.Y), v.Symbol))
+            |> Seq.choose (position)
+            |> Seq.filter (fun p -> p.Exclusive)
+            |> Seq.map (fun p -> KeyValuePair(p.Coord, p.Symbol))
             |> ImmutableDictionary.CreateRange
 
 let tryToChar k =
@@ -45,7 +46,7 @@ let keyToDirection (key: KeyEvent) =
     | _, _                              -> None
 
 type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
-    inherit View(Rect(0,0,60,25)) with
+    inherit View(Rect(0,1,60,20)) with
         override this.ProcessKey key =
             match key |> keyToDirection with
             | Some direction ->
@@ -67,30 +68,47 @@ type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
 
             let view = getView (! state)
             for x in 0 .. 59 do
-                for y in 0 .. 24 do
+                for y in 0 .. 19 do
                     match view.TryGetValue ((x,y)) with
                     | true, ch -> this.AddRune (x, y, Rune ch)
                     | false, _ -> this.AddRune (x, y, Rune '.')
 
         override this.CanFocus = true
 
+let menu =
+    MenuBar (
+        [|
+        MenuBarItem(!!"_Game",
+            [|
+                MenuItem(!!"_Quit", "",
+                    fun () -> Application.RequestStop())
+            |] )
+        |]
+    )
 
 [<EntryPoint>]
 let main argv =
     let schema = ColorScheme()
     schema.Normal <- Attribute(0)
+    schema.Focus <- Attribute(0)
+    schema.HotNormal <- Attribute(0)
+    schema.HotFocus <- Attribute(0);
 
     let player = Entity.Default
                     |> setAgency (Agency.Player)
-                    |> setPosition ({ Position.Actor with Coord = Point.Zero})
-                    |> setVisibility ({ Visible.Actor with Symbol = '@' })
+                    |> setPosition ({ Positionable.Actor with
+                                        Coord = Point.zero
+                                        Symbol = '@'
+                                    })
 
     let monster = Entity.Default
                     |> setAgency (Agency.Wandering)
-                    |> setPosition ({ Position.Actor with Coord = {X=10;Y=15} })
-                    |> setVisibility ({ Visible.Actor with Symbol='m' })
+                    |> setPosition ({ Positionable.Actor with
+                                        Coord = 10,10
+                                        Symbol = 'm'
+                                    })
 
-    let monster2 = monster |> setPosition { Position.Actor with Coord = {X=0;Y=1}}
+    let monster2 = monster |> Position.setCoords (0,1)
 
     let mutable world = WorldState.Empty.Register player
     world <- world.Register monster
@@ -100,14 +118,18 @@ let main argv =
     let stateLogger = StateAgent.getStateLogger()
 
     let rWorld = ref world
-    let arena = Arena (rWorld, state.SetNextAction)
 
     Application.Init()
     let top = Application.Top
-    top.Add arena
 
+    let arena = Arena (rWorld, state.SetNextAction)
     let label = Label(60,24, "Label" |> ustring.Make)
+
     label.ColorScheme <- schema
+    menu.ColorScheme <- schema
+
+    top.Add menu
+    top.Add arena
     top.Add label
 
     let clock = System.Diagnostics.Stopwatch.StartNew()

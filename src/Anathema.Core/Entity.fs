@@ -1,9 +1,6 @@
-namespace Anathema.Core.Entities
-
-open System.Collections.Immutable
+namespace Anathema.Core
 
 open Anathema.Core.Components
-open Anathema.Core.Foundation
 
 [<NoComparison>]
 type Entity = {
@@ -12,13 +9,15 @@ type Entity = {
 
     // Components
     Agency: Agency option
-    Visible: Visible option
-    Position: Position option
-} with 
+    Positionable: Positionable option
+    Destructable: Destructable option
+    Interactable: Interactable option
+} with
     static member Default = {
         Id = 0L
         IsEnabled = false
         Agency = None
-        Visible = None
-        Position = None
+        Destructable = None
+        Positionable = None
+        Interactable = None
     }
