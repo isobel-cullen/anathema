@@ -1,6 +1,5 @@
 ﻿namespace Anathema.Core
 
-open Anathema.Core.Actions
 open Anathema.Core.Components
 open Anathema.Core.Lenses
 
@@ -54,7 +53,7 @@ type World (resumeFromState) =
                 nextPlayerAction <- None
                 let actionWithId = { action with EntityId = entity.Id }
                 let e = entity |> exhaust agency actionWithId
-                { state with 
+                { state with
                     ActionQueue = state.ActionQueue.Enqueue actionWithId
                     Entities = state.Entities.Add (e.Id, e)
                 }

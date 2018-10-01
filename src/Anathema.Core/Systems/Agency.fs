@@ -1,11 +1,11 @@
 module Anathema.Core.Systems.Agency
 
 open Anathema.Core
-open Anathema.Core.Actions
 open Anathema.Core.Components
 open Anathema.Core.Foundation
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
+open Anathema.Core.Systems.Helpers
 
 /// This idea of this time is that the UI shouldn't have to concern itself with
 /// the details of actions, in normal 'bump' style combat the task of
@@ -24,7 +24,7 @@ open Anathema.Core.Lenses
 /// will have to specify a direction anyway.
 type PlayerCommand =
 | Dir of Direction
-| Interact of Direction
+| Interaction of Direction
 | ForceAttack of Direction
 
 let getAction (world: WorldState) (agency: Agency) =
@@ -40,14 +40,17 @@ let getAction (world: WorldState) (agency: Agency) =
     | _-> None
 
 
-
-
-let entityAt point (world: WorldState) =
-    world.Entities
-        |> Map.chooseItemsWith position
-        |> Seq.tryFind (Position.coords >> Option.exists (fun p -> p = point))
+let hasAgency e =
+    match position e with
+    | Some _ -> true
+    | None -> false
 
 let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) =
+    // TODO: implement this when there are actually non-hostile
+    // agents
+    let areHostile subject target =
+        true
+
     let entity = world.Entities.[id]
     match entity.Agency with
     | Some a when a.RequiresInput ->
@@ -55,6 +58,36 @@ let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) 
         | Dir direction, Some pos ->
             let pointOfInterest = (pos.Coord) ++ Point.fromDirection direction
             match world |> entityAt pointOfInterest with
-            | _ -> Action.move direction entity
+            | None -> Action.move direction entity
+            | Some target when hasAgency target ->
+                match areHostile entity target with
+                | false -> Action.Idle (entity.Id)
+                | true ->
+                    {
+                        EntityId = entity.Id
+                        Cost = 75
+                        Type = MeleeAttack direction
+                    }
+            | Some other ->
+                match interactable other with
+                | Some i ->
+                    {
+                        EntityId = entity.Id
+                        Cost = 50
+                        Type = Interact direction
+                    }
+                | None -> Action.Idle (entity.Id)
         | _ -> Action.Idle (entity.Id)
     | _ -> failwith "Shouldn't get here?"
+
+let dispatchAction world (action: Action) =
+    let exhaust ent =
+        match ent |> agency with
+        | Some ag -> ent |> Agency.setEnergy (ag.Energy - action.Cost)
+        | None -> ent
+
+    match action.Type with
+    | Idle -> world
+    | Move dir -> Movement.perform world action
+    | Interact dir -> Interaction.perform world action
+    | _ -> world

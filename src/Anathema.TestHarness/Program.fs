@@ -5,7 +5,6 @@ open System.Collections.Generic
 open System.Collections.Immutable
 
 open Anathema.Core
-open Anathema.Core.Actions
 open Anathema.Core.Components
 open Anathema.Core.Lenses
 open Anathema.Core.FrameworkExtensions

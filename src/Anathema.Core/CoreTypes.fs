@@ -2,9 +2,56 @@ namespace Anathema.Core
 
 open System.Collections.Immutable
 
-open Anathema.Core.Actions
-open Anathema.Core
+open Anathema.Core.Components
 open Anathema.Core.Foundation
+open Anathema.Core.FrameworkExtensions
+
+[<NoComparison>]
+type Entity = {
+    Id: int64
+    IsEnabled: bool
+
+    // Components
+    Agency: Agency option
+    Positionable: Positionable option
+    Destructable: Destructable option
+    Interactable: Interactable option
+} with
+    static member Default = {
+        Id = 0L
+        IsEnabled = false
+        Agency = None
+        Destructable = None
+        Positionable = None
+        Interactable = None
+    }
+
+type ActionResult = {
+    IsComplete: bool
+    IsSuccessful: bool
+}
+
+type ActionType =
+| Idle
+| Move of Direction
+| Interact of Direction
+| MeleeAttack of Direction // TODO: ranged attacks
+
+type Action = {
+    EntityId: int64
+    Cost: int
+    Type: ActionType
+} with
+    static member Idle id =
+        { EntityId = id; Cost = 10; Type = Idle }
+
+module Action =
+    let move direction (entity: Entity) =
+        {
+            EntityId = entity.Id
+            Cost = 50
+            Type = Move direction
+        }
 
 type WorldState = {
     ActionQueue: ImmutableQueue<Action>
@@ -14,7 +61,7 @@ type WorldState = {
     CounterToEntity: ImmutableArray<int64>
 } with
     static member Empty =
-        { 
+        {
             ActionQueue = ImmutableQueue.Empty
             Entities = Map.empty
             NextId = 1L
@@ -50,3 +97,5 @@ type WorldState = {
         match nextCounter, __.Entities.Count with
         | c,ec when c >= ec -> { __ with EntityCounter = 0 }
         | c, _ -> { __ with EntityCounter = nextCounter }
+
+
