@@ -6,22 +6,19 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="ImmutableRingBuffer.fs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="FrameworkExtensions.fs" />
     <Compile Include="Foundation.fs" />
     <Compile Include="Components/Agency.fs" />
     <Compile Include="Components/Positionable.fs" />
     <Compile Include="Components/Component.fs" />
     <Compile Include="Components/Interactablefs.fs" />
-    <Compile Include="Entity.fs" />
-    <Compile Include="Actions.fs" />
-    <Compile Include="WorldState.fs" />
+    <Compile Include="CoreTypes.fs" />
     <Compile Include="Lenses.fs" />
-    <Compile Include="Systems/Agency.fs" />
+    <Compile Include="Systems/Helpers.fs" />
     <Compile Include="Systems/EntityBuilder.fs" />
     <Compile Include="Systems/Movement.fs" />
+    <Compile Include="Systems/Interaction.fs" />
+    <Compile Include="Systems/Agency.fs" />
     <Compile Include="World.fs" />
     <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
     <PackageReference Include="Aether" Version="8.2.0" />

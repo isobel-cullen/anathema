@@ -1,7 +1,6 @@
 module Anathema.Core.Systems.Movement
 
 open Anathema.Core
-open Anathema.Core.Actions
 open Anathema.Core.Components
 open Anathema.Core.Foundation
 open Anathema.Core.FrameworkExtensions

@@ -40,6 +40,7 @@ module Point =
         | West          -> -1,0
         | NorthWest     -> -1,-1
 
+
 [<AutoOpen>]
 module Operators =
     let inline (++) (x1: int ,y1: int) (x2,y2) = (x1 + x2), (y1 + y2)
