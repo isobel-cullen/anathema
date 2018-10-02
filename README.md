@@ -11,7 +11,7 @@ How are we implementing them?
     * Purely immutable game-state
     * If possible, purely data state (so that "saving" becomes JSON serialize)
     * Some mechanism to define things via text files that are loaded at runtime?
-    * A completely type-safe ECS?
+    * Some sort of ECS?
 
 ### Licence
 All code in this repository is under the GNU GPL v3
