@@ -26,6 +26,7 @@ type PlayerCommand =
 | Dir of Direction
 | Interaction of Direction
 | ForceAttack of Direction
+| PlayerAction of Action
 
 let getAction (world: WorldState) (agency: Agency) =
     match agency with
@@ -77,6 +78,7 @@ let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) 
                         Type = Interact direction
                     }
                 | None -> Action.Idle (entity.Id)
+        | PlayerAction act, _ -> act
         | _ -> Action.Idle (entity.Id)
     | _ -> failwith "Shouldn't get here?"
 

@@ -26,30 +26,34 @@ module private ComponentsLenses =
 
 [<AutoOpen>]
 module private AgencyLenses =
-    let energyPrism =
+    let energy_ =
         agencyLens >?> (
             (fun (a: Agency) -> a.Energy),
             (fun value a -> { a with Energy = value }))
 
-    let speedPrism =
+    let speed_ =
         agencyLens >?> (
             (fun (a: Agency) -> a.Speed),
             (fun value a -> { a with Speed = value }))
 
-[<AutoOpen>]
-module private PositionLenses =
-    let coordsPrism =
+module PositionLenses =
+    let coords_ =
         positionLens >?> (
             (fun (p: Positionable) -> p.Coord),
             (fun value p -> { p with Coord = value }))
 
+    let exclusive_ =
+        positionLens >?> (
+            (fun (p: Positionable) -> p.Exclusive),
+            ( fun value p -> { p with Exclusive = value }))
+
 module InteractableLenses =
-    let modePrism =
+    let mode_ =
         interactableLens >?> (
             (fun (i: Interactable) -> i.Mode),
             (fun value i -> { i with Mode = value })
         )
-    let doorPrism =
+    let door_ =
             (fun m -> match m with
                       | Door (state,lockMode) -> Some (state, lockMode)
                       | _ -> None),
@@ -72,18 +76,20 @@ module EntitySetters =
     let setInteractable = Optic.set interactableLens
 
 module Agency =
-    let energy = energyPrism |> Optic.get
-    let setEnergy = energyPrism |> Optic.set
-    let addEnergy =  energyPrism |> Optic.map
-    let speed = speedPrism |> Optic.get
+    let energy = energy_ |> Optic.get
+    let setEnergy = energy_ |> Optic.set
+    let addEnergy =  energy_ |> Optic.map
+    let speed = speed_ |> Optic.get
 
-module Position=
-    let coords = coordsPrism |> Optic.get
-    let setCoords = coordsPrism |> Optic.set
+module Position =
+    open PositionLenses
+
+    let coords = coords_ |> Optic.get
+    let setCoords = coords_ |> Optic.set
 
 module Interaction =
     open InteractableLenses
-    
-    let mode = modePrism |> Optic.get
-    let door = modePrism >?> doorPrism |> Optic.get
-    let setDoor = modePrism >?> doorPrism |> Optic.set
+
+    let mode = mode_ |> Optic.get
+    let door = mode_ >?> door_ |> Optic.get
+    let setDoor = mode_ >?> door_ |> Optic.set

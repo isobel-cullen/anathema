@@ -10,8 +10,8 @@ open Anathema.Core.Lenses.Position
 open Anathema.Core.Foundation
 open Anathema.Core.Systems.Helpers
 open Anathema.Core.WorldState
-open Anathema.Core.Lenses
 open Anathema.Core.Lenses.InteractableLenses
+open Anathema.Core.Lenses.PositionLenses
 
 let chooseWith c e =
     match c e with
@@ -22,11 +22,13 @@ let interactableAt (world: WorldState) (p: Point) =
     world |> entityAt p |> Option.bind (chooseWith interactable)
 
 let toggleDoorState =
-    (modePrism >?> doorPrism |> Optic.map)
+    (mode_ >?> door_ |> Optic.map)
         (fun (door, l) ->
             match door with
             | Open -> Closed, l
             | Closed -> Open, l)
+    >> (exclusive_ |> Optic.map)
+        (fun e -> not e)
 
 let perform (world: WorldState) (action: Action) =
     let entity = world.Entities.[action.EntityId]
@@ -36,7 +38,9 @@ let perform (world: WorldState) (action: Action) =
         match interactableAt world (coords ++ Point.fromDirection dir) with
         | Some (iEntity, i) ->
             match i.Mode with
-            | Door (_, Unlocked) -> world |> replace (toggleDoorState iEntity)
+            | Door (_, Unlocked) ->
+                world |>
+                    replace (toggleDoorState iEntity )
             | Door (doorState, lockMode) ->
                 // TODO: unlocking and locking doors
                 world
