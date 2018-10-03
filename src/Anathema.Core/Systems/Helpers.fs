@@ -6,10 +6,11 @@ module Anathema.Core.Systems.Helpers
 ///
 
 open Anathema.Core
+open Anathema.Core.Foundation
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
 
-let entityAt point (world: WorldState) =
+let entityAt (point: Point) (world: WorldState) =
     world.Entities
         |> Map.chooseItemsWith position
         |> Seq.tryFind (Position.coords >> Option.exists (fun p -> p = point))

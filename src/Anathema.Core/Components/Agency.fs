@@ -10,8 +10,8 @@ type Agency = {
     Speed: int
     RequiresInput: bool
     Behaviour: BehaviourResolver option
-} with 
-    static member Default = { 
+} with
+    static member Default = {
         Energy = 0
         Speed = 0
         RequiresInput = false

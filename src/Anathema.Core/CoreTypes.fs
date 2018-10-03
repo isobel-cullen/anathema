@@ -99,3 +99,6 @@ type WorldState = {
         | c, _ -> { __ with EntityCounter = nextCounter }
 
 
+module WorldState =
+    let replace entity (state: WorldState) = state.Replace entity
+    let register entity (state: WorldState) = state.Register entity

@@ -15,4 +15,7 @@ type InteractionMode =
 
 type Interactable = {
     Mode: InteractionMode
-}
+} with
+    static member UnlockedDoor =
+        { Mode = Door (Closed, Unlocked) }
+

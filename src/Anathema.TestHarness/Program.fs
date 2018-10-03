@@ -13,6 +13,7 @@ open Anathema.Core.Systems
 open Terminal.Gui
 open NStack
 open Terminal.Gui
+open Anathema.Core.Lenses
 
 type KeyActionChooser = Key -> Action option
 
@@ -93,6 +94,14 @@ let main argv =
     schema.HotNormal <- Attribute(0)
     schema.HotFocus <- Attribute(0);
 
+    let wall = Entity.Default
+                    |> setPosition ({ Positionable.Default with Symbol = '#' })
+
+    let door = Entity.Default
+                |> setPosition ({ Positionable.Default with Symbol = '+' })
+                |> setInteractable (Interactable.UnlockedDoor)
+                |> Position.setCoords (10,10)
+
     let player = Entity.Default
                     |> setAgency (Agency.Player)
                     |> setPosition ({ Positionable.Actor with
@@ -103,7 +112,7 @@ let main argv =
     let monster = Entity.Default
                     |> setAgency (Agency.Wandering)
                     |> setPosition ({ Positionable.Actor with
-                                        Coord = 10,10
+                                        Coord = 13,13
                                         Symbol = 'm'
                                     })
 
@@ -112,6 +121,17 @@ let main argv =
     let mutable world = WorldState.Empty.Register player
     world <- world.Register monster
     world <- world.Register monster2
+
+    for x in 10 .. 20 do
+        for y in [5; 15] do
+            world <- world.Register (wall |> Position.setCoords (x,y))
+
+    for x in [10;20] do
+        for y in 5 .. 15 do
+            if y <> 10  || x <> 10 then
+                world <- world.Register (wall |> Position.setCoords (x,y))
+
+    world <- world.Register door
 
     let state = World world
     let stateLogger = StateAgent.getStateLogger()
@@ -127,7 +147,6 @@ let main argv =
     label.ColorScheme <- schema
     menu.ColorScheme <- schema
 
-    top.Add menu
     top.Add arena
     top.Add label
 

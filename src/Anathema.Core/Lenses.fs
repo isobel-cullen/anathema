@@ -43,6 +43,20 @@ module private PositionLenses =
             (fun (p: Positionable) -> p.Coord),
             (fun value p -> { p with Coord = value }))
 
+module InteractableLenses =
+    let modePrism =
+        interactableLens >?> (
+            (fun (i: Interactable) -> i.Mode),
+            (fun value i -> { i with Mode = value })
+        )
+    let doorPrism =
+            (fun m -> match m with
+                      | Door (state,lockMode) -> Some (state, lockMode)
+                      | _ -> None),
+            (fun (ds) m -> match m with
+                           | Door _ -> Door ds
+                           | m -> m)
+
 [<AutoOpen>]
 module EntityGetters =
     let agency = Optic.get agencyLens
@@ -66,3 +80,10 @@ module Agency =
 module Position=
     let coords = coordsPrism |> Optic.get
     let setCoords = coordsPrism |> Optic.set
+
+module Interaction =
+    open InteractableLenses
+    
+    let mode = modePrism |> Optic.get
+    let door = modePrism >?> doorPrism |> Optic.get
+    let setDoor = modePrism >?> doorPrism |> Optic.set
