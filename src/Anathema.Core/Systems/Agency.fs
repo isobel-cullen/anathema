@@ -40,9 +40,13 @@ let getAction (world: WorldState) (agency: Agency) =
             } |> Some
     | _-> None
 
+let shouldInteract interactable =
+    match interactable.Mode with
+    | Door (Closed, _) -> true
+    | _ -> false
 
 let hasAgency e =
-    match position e with
+    match agency e with
     | Some _ -> true
     | None -> false
 
@@ -71,13 +75,13 @@ let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) 
                     }
             | Some other ->
                 match interactable other with
-                | Some i ->
+                | Some i when shouldInteract i ->
                     {
                         EntityId = entity.Id
                         Cost = 50
                         Type = Interact direction
                     }
-                | None -> Action.Idle (entity.Id)
+                | _ -> entity |> Action.move direction
         | PlayerAction act, _ -> act
         | _ -> Action.Idle (entity.Id)
     | _ -> failwith "Shouldn't get here?"

@@ -25,8 +25,14 @@ let getView (state : WorldState) =
             |> Seq.map (fun kv -> kv.Value)
             |> Seq.choose (position)
             |> Seq.filter (fun p -> p.Exclusive)
-            |> Seq.map (fun p -> KeyValuePair(p.Coord, p.Symbol))
-            |> ImmutableDictionary.CreateRange
+            |> Seq.groupBy (fun p -> p.Coord)
+            |> Seq.map (fun (xy, ps) ->
+                let topSymbol =
+                    ps
+                    |> Seq.sortByDescending (fun p -> p.Layer)
+                    |> Seq.head
+                xy, topSymbol.Symbol)
+            |> Map.ofSeq
 
 let tryToChar k =
     if k >= int Char.MinValue && k <= int Char.MaxValue then
@@ -45,16 +51,12 @@ let keyToDirection (key: KeyEvent) =
     | _, Some 'n'                       -> Direction.SouthEast |> Some
     | _, _                              -> None
 
-type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
+type Arena (state: WorldState ref, setPlayerAction: Agency.PlayerCommand -> unit) =
     inherit View(Rect(0,1,60,20)) with
         override this.ProcessKey key =
             match key |> keyToDirection with
             | Some direction ->
-                { 
-                    EntityId = 0L;
-                    Cost = 50
-                    Type = Move direction
-                } |> setPlayerAction
+                Agency.PlayerCommand.Dir direction |> setPlayerAction
                 true
             | _ -> 
                 match tryToChar (key.KeyValue) with
@@ -69,9 +71,9 @@ type Arena (state: WorldState ref, setPlayerAction: Action -> unit) =
             let view = getView (! state)
             for x in 0 .. 59 do
                 for y in 0 .. 19 do
-                    match view.TryGetValue ((x,y)) with
-                    | true, ch -> this.AddRune (x, y, Rune ch)
-                    | false, _ -> this.AddRune (x, y, Rune '.')
+                    match view.TryFind ((x,y)) with
+                    | Some ch -> this.AddRune (x, y, Rune ch)
+                    | _ -> this.AddRune (x, y, Rune '.')
 
         override this.CanFocus = true
 

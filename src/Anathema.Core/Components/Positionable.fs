@@ -4,6 +4,10 @@ type Layer =
 | Background    // what is the ground is made of, eq water | dirt
 | OnFloor         // what is on the ground, eq items
 | Foreground    // what is the "main" thing there, eq @ or a door
+    with static member Ordering = function
+                | Background -> -1
+                | OnFloor -> 0
+                | Foreground -> 1
 
 type Positionable = {
     Exclusive: bool

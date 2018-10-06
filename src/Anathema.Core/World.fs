@@ -24,7 +24,7 @@ type World (resumeFromState) =
         | false ->
             let action = state.ActionQueue.Peek()
             let state =
-                { (Systems.Movement.perform state action) with
+                { (Systems.Agency.dispatchAction state action) with
                     ActionQueue = state.ActionQueue.Dequeue() }
             doActions state 
 
@@ -49,8 +49,9 @@ type World (resumeFromState) =
                     } |> advance |> getActions
                 | _ -> state |> advance
             | true, true, None -> state
-            | true, true, Some action -> 
+            | true, true, Some pA ->
                 nextPlayerAction <- None
+                let action = Systems.Agency.playerMoveToAction (currentState) (entity.Id) pA
                 let actionWithId = { action with EntityId = entity.Id }
                 let e = entity |> exhaust agency actionWithId
                 { state with
@@ -64,7 +65,7 @@ type World (resumeFromState) =
 
     new () = World WorldState.Empty
 
-    member __.SetNextAction (action: Action) =
+    member __.SetNextAction (action: Systems.Agency.PlayerCommand) =
         if nextPlayerAction.IsNone then nextPlayerAction <- action |> Some
 
     member __.Process () =
