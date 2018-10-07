@@ -29,6 +29,8 @@ let toggleDoorState =
             | Closed -> Open, l)
     >> (exclusive_ |> Optic.map)
         (fun e -> not e)
+    >> (symbol_ |> Optic.map)
+        (fun e -> if e = '+' then '/' else '+')
 
 let perform (world: WorldState) (action: Action) =
     let entity = world.Entities.[action.EntityId]

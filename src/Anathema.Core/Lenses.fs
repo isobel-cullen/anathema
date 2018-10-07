@@ -45,7 +45,12 @@ module PositionLenses =
     let exclusive_ =
         positionLens >?> (
             (fun (p: Positionable) -> p.Exclusive),
-            ( fun value p -> { p with Exclusive = value }))
+            (fun value p -> { p with Exclusive = value }))
+
+    let symbol_ =
+        positionLens >?> (
+            (fun (p: Positionable) -> p.Symbol),
+            (fun value p -> { p with Symbol = value}))
 
 module InteractableLenses =
     let mode_ =

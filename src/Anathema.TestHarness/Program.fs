@@ -24,7 +24,6 @@ let getView (state : WorldState) =
             |> Seq.filter (fun kv -> kv.Value.IsEnabled)
             |> Seq.map (fun kv -> kv.Value)
             |> Seq.choose (position)
-            |> Seq.filter (fun p -> p.Exclusive)
             |> Seq.groupBy (fun p -> p.Coord)
             |> Seq.map (fun (xy, ps) ->
                 let topSymbol =
