@@ -132,6 +132,9 @@ let main argv =
             if y <> 10  || x <> 10 then
                 world <- world.Register (wall |> Position.setCoords (x,y))
 
+    for (x,y) in (Foundation.Lines.bresenham (12,1) (27,9)) do
+        world <- world.Register (wall |> Position.setCoords (x,y))
+
     world <- world.Register door
 
     let state = World world

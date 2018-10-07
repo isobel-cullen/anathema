@@ -40,9 +40,7 @@ let perform (world: WorldState) (action: Action) =
         match interactableAt world (coords ++ Point.fromDirection dir) with
         | Some (iEntity, i) ->
             match i.Mode with
-            | Door (_, Unlocked) ->
-                world |>
-                    replace (toggleDoorState iEntity )
+            | Door (_, Unlocked) -> world |> replace (toggleDoorState iEntity )
             | Door (doorState, lockMode) ->
                 // TODO: unlocking and locking doors
                 world

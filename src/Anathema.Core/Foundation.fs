@@ -40,6 +40,40 @@ module Point =
         | West          -> -1,0
         | NorthWest     -> -1,-1
 
+module Lines =
+    let bresenham (origin: Point) (destination: Point) =
+        let x1,y1 = origin
+        let x2,y2 = destination
+
+        let dx = x2 - x1
+        let dy = y2 - y1
+
+        let mutable d = 2 * dy - dx
+        let mutable y = y1
+
+        seq {
+            for x in x1 .. x2 do
+                yield (x,y)
+                if d > 0 then
+                    y <- y + 1
+                    d <- d - 2 * dx
+                d <- d + 2 * dy
+            }
+
+    module Rect =
+        let fromOppositeCorners (c1: Point) (c2: Point) =
+            let x1,y1 = c1
+            let x2,y2 = c2
+
+            seq {
+                for x in x1 .. x2 do
+                    for y in y1 .. y2 do
+                        yield (x,y)
+            }
+
+        let fromDimensions origin x y =
+            let ox,oy = origin
+            fromOppositeCorners origin (ox + x, oy + y)
 
 [<AutoOpen>]
 module Operators =
