@@ -72,8 +72,11 @@ module Lines =
             }
 
         let fromDimensions origin x y =
-            let ox,oy = origin
-            fromOppositeCorners origin (ox + x, oy + y)
+            if x <= 1 && y <= 0 then
+                Seq.empty
+            else
+                let ox,oy = origin
+                fromOppositeCorners origin (ox + (x-1), oy + (y-1))
 
 [<AutoOpen>]
 module Operators =
