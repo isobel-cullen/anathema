@@ -40,6 +40,11 @@ module Point =
         | West          -> -1,0
         | NorthWest     -> -1,-1
 
+[<AutoOpen>]
+module Operators =
+    let inline (++) (x1: int ,y1: int) (x2,y2) = (x1 + x2), (y1 + y2)
+    let inline (--) (x1: int, y1: int) (x2,y2) = (x1 - x2), (y1 - y2)
+
 module Lines =
     let bresenham (origin: Point) (destination: Point) =
         let x1,y1 = origin
@@ -78,7 +83,47 @@ module Lines =
                 let ox,oy = origin
                 fromOppositeCorners origin (ox + (x-1), oy + (y-1))
 
-[<AutoOpen>]
-module Operators =
-    let inline (++) (x1: int ,y1: int) (x2,y2) = (x1 + x2), (y1 + y2)
-    let inline (--) (x1: int, y1: int) (x2,y2) = (x1 - x2), (y1 - y2)
+    module Circle =
+        let bresenham (origin: Point) (radius: int) =
+            let allOctants (ox,oy) x y =
+                [
+                    ox + x, oy + y
+                    ox - x, oy + y
+                    ox + x, oy - y
+                    ox - x, oy - y
+                    ox + y, oy + x
+                    ox - y, oy + x
+                    ox + y, oy - x
+                    ox - y, oy - x
+                ]
+
+            match radius with
+            | 1 -> [ origin ]
+            | 2 ->
+                [
+                    origin
+                    origin ++ Point.fromDirection North
+                    origin ++ Point.fromDirection East
+                    origin ++ Point.fromDirection West
+                    origin ++ Point.fromDirection South
+                ]
+            | _ ->
+                // from https://www.geeksforgeeks.org/bresenhams-circle-drawing-algorithm/
+                // pretty sure it is broken
+                let mutable x = 0
+                let mutable y = radius
+                let mutable d = radius
+
+                [
+                    while y >= x do
+                        yield! allOctants origin x y
+                        x <- x + 1
+
+                        if d > 0 then
+                            y <- y - 1
+                            d <- d + 4 * (x - y) + 10
+                        else
+                            d <- d + 4 * 6
+
+                        yield! allOctants origin x y
+                ]

@@ -80,3 +80,13 @@ let ``Rect should have sensible area length * height`` (origin:int*int, l:Positi
     Rect.fromDimensions origin (l.Get) (h.Get)
     |> Seq.length
     |> ((=) (l.Get * h.Get))
+
+[<Fact>]
+let ``A radius 1 circle should just be the origin`` () =
+    Circle.bresenham (1,1) 0
+        |> should equal [1,1]
+
+[<Fact>]
+let ``A radius 2 circle should have 5 points`` () =
+    Circle.bresenham (2,2) 2
+        |> should haveLength 5
