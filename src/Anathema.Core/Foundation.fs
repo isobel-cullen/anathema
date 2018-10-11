@@ -26,6 +26,11 @@ type Direction =
 
 type Point = int * int
 module Point =
+    [<AutoOpen>]
+    module Operators =
+        let inline (++) (x1: int ,y1: int) (x2,y2) = (x1 + x2), (y1 + y2)
+        let inline (--) (x1: int, y1: int) (x2,y2) = (x1 - x2), (y1 - y2)
+
     let zero = 0,0
     let one = 1,1
 
@@ -40,12 +45,28 @@ module Point =
         | West          -> -1,0
         | NorthWest     -> -1,-1
 
-[<AutoOpen>]
-module Operators =
-    let inline (++) (x1: int ,y1: int) (x2,y2) = (x1 + x2), (y1 + y2)
-    let inline (--) (x1: int, y1: int) (x2,y2) = (x1 - x2), (y1 - y2)
+    /// points around an origin, eg given origin
+    /// .......
+    /// ...o...
+    /// .......
+    /// return
+    /// ..***..
+    /// ..*.*..
+    /// ..***..
+    let around (p: Point) =
+        [
+            p ++ fromDirection North
+            p ++ fromDirection NorthEast
+            p ++ fromDirection East
+            p ++ fromDirection SouthEast
+            p ++ fromDirection South
+            p ++ fromDirection SouthWest
+            p ++ fromDirection West
+            p ++ fromDirection NorthWest
+        ]
 
 module Lines =
+    // implementation of https://en.wikipedia.org/wiki/Bresenham's_line_algorithm
     let bresenham (origin: Point) (destination: Point) =
         let x1,y1 = origin
         let x2,y2 = destination
@@ -66,6 +87,8 @@ module Lines =
             }
 
     module Rect =
+        open Point
+        /// top left corner to bottom right
         let fromOppositeCorners (c1: Point) (c2: Point) =
             let x1,y1 = c1
             let x2,y2 = c2
@@ -76,14 +99,16 @@ module Lines =
                         yield (x,y)
             }
 
+        /// origin is the top-left corner
         let fromDimensions origin x y =
             if x <= 1 && y <= 0 then
                 Seq.empty
             else
-                let ox,oy = origin
-                fromOppositeCorners origin (ox + (x-1), oy + (y-1))
+                fromOppositeCorners origin (origin ++ (x-1,y-1))
 
     module Circle =
+        open Point
+
         let bresenham (origin: Point) (radius: int) =
             let allOctants (ox,oy) x y =
                 [
@@ -98,6 +123,7 @@ module Lines =
                 ]
 
             match radius with
+            | 0 -> List.empty
             | 1 -> [ origin ]
             | 2 ->
                 [

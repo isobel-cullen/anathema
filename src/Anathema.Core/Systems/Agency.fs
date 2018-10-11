@@ -3,6 +3,7 @@ module Anathema.Core.Systems.Agency
 open Anathema.Core
 open Anathema.Core.Components
 open Anathema.Core.Foundation
+open Anathema.Core.Foundation.Point
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
 open Anathema.Core.Systems.Helpers
@@ -94,6 +95,6 @@ let dispatchAction world (action: Action) =
 
     match action.Type with
     | Idle -> world
-    | Move dir -> Movement.perform world action
-    | Interact dir -> Interaction.perform world action
+    | Move _ -> Movement.perform world action
+    | Interact _ -> Interaction.perform world action
     | _ -> world

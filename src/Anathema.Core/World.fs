@@ -33,22 +33,22 @@ type World (resumeFromState) =
         match agency entity with
         | Some agency ->
             match agency |> canAct, agency.RequiresInput, nextPlayerAction with
+            | true, true, None -> state
             | false, _, _ ->
-                entity 
+                entity
                     |> setAgency (energise agency)
-                    |> state.Replace 
+                    |> state.Replace
                     |> advance
                     |> getActions
             | true, false, _ ->
                 match Systems.Agency.getAction state agency with
-                | Some action -> 
+                | Some action ->
                     let e = entity |> exhaust agency action
-                    { state with 
-                        ActionQueue = state.ActionQueue.Enqueue action 
+                    { state with
+                        ActionQueue = state.ActionQueue.Enqueue action
                         Entities = state.Entities.Add (e.Id, e)
                     } |> advance |> getActions
                 | _ -> state |> advance
-            | true, true, None -> state
             | true, true, Some pA ->
                 nextPlayerAction <- None
                 let action = Systems.Agency.playerMoveToAction (currentState) (entity.Id) pA

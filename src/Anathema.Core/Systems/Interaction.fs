@@ -8,6 +8,7 @@ open Anathema.Core.Components
 open Anathema.Core.Lenses
 open Anathema.Core.Lenses.Position
 open Anathema.Core.Foundation
+open Anathema.Core.Foundation.Point
 open Anathema.Core.Systems.Helpers
 open Anathema.Core.WorldState
 open Anathema.Core.Lenses.InteractableLenses

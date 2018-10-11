@@ -3,6 +3,7 @@ module Anathema.Core.Systems.Movement
 open Anathema.Core
 open Anathema.Core.Components
 open Anathema.Core.Foundation
+open Anathema.Core.Foundation.Point
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
 

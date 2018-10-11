@@ -8,7 +8,7 @@ open FsUnit
 open FsUnit.Xunit
 
 open Anathema.Core.Foundation.Lines
-open Anathema.Core.Foundation
+open Anathema.Core.Foundation.Point
 
 let uncurry f (a,b) = f a b
 
@@ -83,7 +83,7 @@ let ``Rect should have sensible area length * height`` (origin:int*int, l:Positi
 
 [<Fact>]
 let ``A radius 1 circle should just be the origin`` () =
-    Circle.bresenham (1,1) 0
+    Circle.bresenham (1,1) 1
         |> should equal [1,1]
 
 [<Fact>]
