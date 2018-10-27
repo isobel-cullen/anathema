@@ -31,7 +31,7 @@ type PlayerCommand =
 
 let getAction (world: WorldState) (agency: Agency) =
     match agency with
-    | { Behaviour=Some behaviour; RequiresInput=false } ->
+    | { Kind=Npc(behaviour) } ->
         match behaviour with
         | _ ->
             {
@@ -59,7 +59,7 @@ let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) 
 
     let entity = world.Entities.[id]
     match entity.Agency with
-    | Some a when a.RequiresInput ->
+    | Some a when a.Kind = Player ->
         match command, (position entity) with
         | Dir direction, Some pos ->
             let pointOfInterest = (pos.Coord) ++ Point.fromDirection direction
@@ -88,11 +88,6 @@ let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) 
     | _ -> failwith "Shouldn't get here?"
 
 let dispatchAction world (action: Action) =
-    let exhaust ent =
-        match ent |> agency with
-        | Some ag -> ent |> Agency.setEnergy (ag.Energy - action.Cost)
-        | None -> ent
-
     match action.Type with
     | Idle -> world
     | Move _ -> Movement.perform world action

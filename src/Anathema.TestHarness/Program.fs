@@ -76,17 +76,6 @@ type Arena (state: WorldState ref, setPlayerAction: Agency.PlayerCommand -> unit
 
         override this.CanFocus = true
 
-let menu =
-    MenuBar (
-        [|
-        MenuBarItem(!!"_Game",
-            [|
-                MenuItem(!!"_Quit", "",
-                    fun () -> Application.RequestStop())
-            |] )
-        |]
-    )
-
 [<EntryPoint>]
 let main argv =
     let schema = ColorScheme()
@@ -149,23 +138,23 @@ let main argv =
     let label = Label(60,24, "Label" |> ustring.Make)
 
     label.ColorScheme <- schema
-    menu.ColorScheme <- schema
 
     top.Add arena
     top.Add label
 
     let clock = System.Diagnostics.Stopwatch.StartNew()
-    let setState e =
-        let nextState = state.Process()
-        if Object.ReferenceEquals(! rWorld, nextState) |> not then
-            clock.Restart()
+    let setState _ =
+        clock.Restart()
 
+        let nextState = state.Process()
+
+        if Object.ReferenceEquals(! rWorld, nextState) |> not then
             rWorld := nextState
             top.SetNeedsDisplay()
             stateLogger.Post nextState
 
-            label.Text <- (sprintf "%d" clock.ElapsedMilliseconds |> ustring.Make)
-            label.SetNeedsDisplay()
+        label.Text <- (sprintf "%d" clock.ElapsedMilliseconds |> ustring.Make)
+        label.SetNeedsDisplay()
 
     Application.Iteration.Add setState
     Application.Run top

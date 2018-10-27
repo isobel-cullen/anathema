@@ -12,6 +12,7 @@ type DoorState =
 
 type InteractionMode =
 | Door of DoorState * LockMode
+| Dummy
 
 type Interactable = {
     Mode: InteractionMode

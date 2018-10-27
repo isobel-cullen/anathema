@@ -24,3 +24,20 @@ module Map =
                 | Some _ -> yield kv.Value
                 | None -> ()
             }
+
+
+module Option =
+    let withDefault (def: 'b) (binder: 'a -> 'b option) =
+        fun (x: 'a) ->
+            match binder x with
+            | Some value -> value
+            | None -> def
+            
+    let lift (binder: 'a -> 'b) (optionf: 'c -> 'a option) =
+        fun x -> Option.map binder (optionf x)
+
+
+module Operators =
+    module Options =
+        let (>>?) f d = Option.withDefault d f
+        let (>>=) opt binder = Option.lift binder opt

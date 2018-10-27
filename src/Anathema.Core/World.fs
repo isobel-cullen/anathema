@@ -1,22 +1,36 @@
 ﻿namespace Anathema.Core
 
+open Aether
+open Aether.Operators
+
 open Anathema.Core.Components
+open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
+open Anathema.Core.Lenses.Agency
+
+module Constants =
+    let ``Base Energy Gain`` = 25
 
 type World (resumeFromState) =
     let mutable currentState = resumeFromState
     let mutable nextPlayerAction = None
 
+
     let advance (state: WorldState) = state.AdvanceEntityCounter()
 
     let exhaust agency action entity =
         entity |> setAgency
-            { agency with Energy = agency.Energy - action.Cost }
+            { agency with Energy = agency.Energy - action.Cost }        
 
-    let energise (agency: Agency) = { agency with Energy = agency.Energy + agency.Speed }
+    let energise (entity: Entity) =
+        let recoveryAmount =
+                Characteristics.agility
+                |> Option.lift (((+) Constants.``Base Energy Gain``))
+                |> Option.withDefault (Constants.``Base Energy Gain``)
+        entity |> addEnergy ((+) (entity |> recoveryAmount))
 
     let canAct (agency: Agency) = agency.Energy >= 100
-    let requiresInput (agency: Agency) = agency.RequiresInput
+    let requiresInput (agency: Agency) = agency.Kind = Player
 
     let rec doActions (state: WorldState) =
         match state.ActionQueue.IsEmpty with
@@ -32,11 +46,11 @@ type World (resumeFromState) =
         let entity = state.CurrentEntity
         match agency entity with
         | Some agency ->
-            match agency |> canAct, agency.RequiresInput, nextPlayerAction with
+            match agency |> canAct, requiresInput agency, nextPlayerAction with
             | true, true, None -> state
             | false, _, _ ->
                 entity
-                    |> setAgency (energise agency)
+                    |> energise
                     |> state.Replace
                     |> advance
                     |> getActions

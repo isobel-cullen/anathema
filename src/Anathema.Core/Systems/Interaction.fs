@@ -13,6 +13,7 @@ open Anathema.Core.Systems.Helpers
 open Anathema.Core.WorldState
 open Anathema.Core.Lenses.InteractableLenses
 open Anathema.Core.Lenses.PositionLenses
+open Anathema.Core.Lenses.Components
 
 let chooseWith c e =
     match c e with
@@ -23,16 +24,15 @@ let interactableAt (world: WorldState) (p: Point) =
     world |> entityAt p |> Option.bind (chooseWith interactable)
 
 let toggleDoorState =
-    (mode_ >?> door_ |> Optic.map)
+    (interactableLens >?> mode_ >?> door_ |> Optic.map)
         (fun (door, l) ->
             match door with
             | Open -> Closed, l
-            | Closed -> Open, l)
-    >> (exclusive_ |> Optic.map)
-        (fun e -> not e)
-    >> (symbol_ |> Optic.map)
+            | Closed -> Open, l)  
+    >> (position_ >?> exclusive_ |> Optic.map) not
+    >> (position_ >?> symbol_ |> Optic.map)
         (fun e -> if e = '+' then '/' else '+')
-
+        
 let perform (world: WorldState) (action: Action) =
     let entity = world.Entities.[action.EntityId]
 
