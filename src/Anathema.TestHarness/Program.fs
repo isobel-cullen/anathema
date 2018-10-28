@@ -50,8 +50,10 @@ let keyToDirection (key: KeyEvent) =
     | _, Some 'n'                       -> Direction.SouthEast |> Some
     | _, _                              -> None
 
-type Arena (state: WorldState ref, setPlayerAction: Agency.PlayerCommand -> unit) =
-    inherit View(Rect(0,1,60,20)) with
+type Arena (state: WorldState ref, bounds: int * int, setPlayerAction: Agency.PlayerCommand -> unit) =
+    inherit View(Rect(0,1, fst bounds, snd bounds)) with
+        let xBounds,yBounds = bounds
+
         override this.ProcessKey key =
             match key |> keyToDirection with
             | Some direction ->
@@ -68,13 +70,15 @@ type Arena (state: WorldState ref, setPlayerAction: Agency.PlayerCommand -> unit
             base.Redraw(rect)
 
             let view = getView (! state)
-            for x in 0 .. 59 do
-                for y in 0 .. 19 do
+            for x in 0 .. xBounds - 1 do
+                for y in 0 .. yBounds - 1 do
                     match view.TryFind ((x,y)) with
                     | Some ch -> this.AddRune (x, y, Rune ch)
                     | _ -> this.AddRune (x, y, Rune '.')
 
         override this.CanFocus = true
+
+        
 
 [<EntryPoint>]
 let main argv =
@@ -100,7 +104,7 @@ let main argv =
                                     })
 
     let monster = Entity.Default
-                    |> setAgency (Agency.Wandering)
+                    |> setAgency (Agency.Aggressive)
                     |> setPosition ({ Positionable.Actor with
                                         Coord = 13,13
                                         Symbol = 'm'
@@ -134,7 +138,7 @@ let main argv =
     Application.Init()
     let top = Application.Top
 
-    let arena = Arena (rWorld, state.SetNextAction)
+    let arena = Arena (rWorld, (!rWorld).Bounds, state.SetNextAction)
     let label = Label(60,24, "Label" |> ustring.Make)
 
     label.ColorScheme <- schema

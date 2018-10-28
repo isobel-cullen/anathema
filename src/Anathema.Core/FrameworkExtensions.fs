@@ -14,7 +14,7 @@ module Map =
     let chooseValues chooser (map: Map<'k,'v>) =
         seq { for kv in map do
                 match chooser (kv.Value) with
-                | Some value -> yield value
+                | Some value -> yield kv.Value
                 | None -> ()
             }
 

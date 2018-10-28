@@ -59,6 +59,7 @@ type WorldState = {
     NextId: int64
     EntityCounter: int
     CounterToEntity: ImmutableArray<int64>
+    Bounds: int * int
 } with
     static member Empty =
         {
@@ -67,6 +68,7 @@ type WorldState = {
             NextId = 1L
             EntityCounter = 0
             CounterToEntity = ImmutableArray.Empty
+            Bounds = 60, 20
         }
 
     member __.Register entity =
@@ -97,7 +99,6 @@ type WorldState = {
         match nextCounter, __.Entities.Count with
         | c,ec when c >= ec -> { __ with EntityCounter = 0 }
         | c, _ -> { __ with EntityCounter = nextCounter }
-
 
 module WorldState =
     let replace entity (state: WorldState) = state.Replace entity

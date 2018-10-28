@@ -6,6 +6,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="Systems\Agency\" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="FrameworkExtensions.fs" />
     <Compile Include="Foundation.fs" />
     <Compile Include="Components/Agency.fs" />
@@ -14,6 +17,8 @@
     <Compile Include="Components/Interactablefs.fs" />
     <Compile Include="CoreTypes.fs" />
     <Compile Include="Lenses.fs" />
+    <Compile Include="Systems/Agency/Pathfinding.fs" />
+    <Compile Include="Systems/Agency/NpcBehaviour.fs" />
     <Compile Include="Systems/Helpers.fs" />
     <Compile Include="Systems/EntityBuilder.fs" />
     <Compile Include="Systems/Movement.fs" />

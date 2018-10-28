@@ -5,6 +5,7 @@ open Aether.Operators
 
 open Anathema.Core
 open Anathema.Core.Components
+open Anathema.Core.FrameworkExtensions
 
 module private Int =
     let id_ = fun f _ x -> f x
@@ -92,6 +93,11 @@ module EntitySetters =
 module Agency =
     open AgencyLenses
 
+    let isPlayer = 
+        (Components.agency_ >?> kind_ |> Optic.get)
+            |> Option.lift ((=) Player)
+            |> Option.withDefault false
+
     let energy = energy_ |> Optic.get
     let addEnergy = Components.agency_ >?> energy_ |> Optic.map
 
@@ -106,7 +112,7 @@ module Characteristics =
 
 module Position =
     open PositionLenses
-
+    let exclusive = Components.position_ >?> exclusive_ |> Optic.get
     let coords = Components.position_ >?> coords_ |> Optic.get
     let setCoords = Components.position_ >?> coords_ |> Optic.set
 

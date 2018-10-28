@@ -24,6 +24,18 @@ type Direction =
         | 8 -> NorthWest
         | _ -> failwith "impossible"
 
+    static member FromXY (x,y) =
+        match x,y with
+        | 0,-1  -> North
+        | 1,-1  -> NorthEast
+        | 1,0   -> East
+        | 1,1   -> SouthEast
+        | 0,1   -> South
+        | -1,1  -> SouthWest
+        | -1,0  -> West
+        | -1,-1 -> NorthWest
+        | _   -> Centre
+
 type Point = int * int
 module Point =
     [<AutoOpen>]

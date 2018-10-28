@@ -7,6 +7,7 @@ open Anathema.Core.Foundation.Point
 open Anathema.Core.FrameworkExtensions
 open Anathema.Core.Lenses
 open Anathema.Core.Systems.Helpers
+open Anathema.Core.Systems.NpcBehaviour
 
 /// This idea of this time is that the UI shouldn't have to concern itself with
 /// the details of actions, in normal 'bump' style combat the task of
@@ -32,13 +33,7 @@ type PlayerCommand =
 let getAction (world: WorldState) (agency: Agency) =
     match agency with
     | { Kind=Npc(behaviour) } ->
-        match behaviour with
-        | _ ->
-            {
-                EntityId = world.CurrentEntity.Id
-                Type = Move <| Direction.Random()
-                Cost = 50
-            } |> Some
+        NpcBehaviour.getNextAction world behaviour
     | _-> None
 
 let shouldInteract interactable =

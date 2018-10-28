@@ -77,3 +77,6 @@ type Agency = {
 
     static member Wandering =
         { Agency.Default with Kind = (Wandering |> Npc) }
+
+    static member Aggressive =
+        { Agency.Default with Kind = (Aggressive |> Npc) }
