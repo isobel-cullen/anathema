@@ -22,11 +22,11 @@ let generateDijkstraMap x y blocked goals =
     let ceiling = (x * y)
     let arena = Array2D.create x y ceiling 
 
-    for (gx,gy) in goals do
-        arena.[gx,gy] <- 0
-
     for (bx,by) in blocked do
         arena.[bx,by] <- Int32.MaxValue
+
+    for (gx,gy) in goals do
+        arena.[gx,gy] <- 0
         
     let initialSet = goals 
                     |> Seq.collect (fun (x,y) -> neighbours x y arena)

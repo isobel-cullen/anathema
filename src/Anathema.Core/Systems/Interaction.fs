@@ -34,7 +34,7 @@ let toggleDoorState =
         (fun e -> if e = '+' then '/' else '+')
         
 let perform (world: WorldState) (action: Action) =
-    let entity = world.Entities.[action.EntityId]
+    let entity = world.EntitiesById.[action.EntityId]
 
     match action.Type, coords entity with
     | Interact dir, Some coords ->

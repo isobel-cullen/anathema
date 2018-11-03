@@ -52,7 +52,7 @@ let playerMoveToAction (world: WorldState) (id: int64) (command: PlayerCommand) 
     let areHostile subject target =
         true
 
-    let entity = world.Entities.[id]
+    let entity = world.EntitiesById.[id]
     match entity.Agency with
     | Some a when a.Kind = Player ->
         match command, (position entity) with

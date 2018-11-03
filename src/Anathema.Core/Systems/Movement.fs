@@ -22,7 +22,7 @@ module Impl =
 
     let isNotBlocked (state: WorldState) point (direction: Direction) =
         let prospectivePosision = point.Coord ++ (Point.fromDirection direction)
-        state.Entities
+        state.EntitiesById
             |> Map.chooseValues position
             |> Seq.filter (exclusive >> Option.defaultValue false)
             |> Seq.exists (coords >> Option.exists ((=) prospectivePosision))
@@ -37,7 +37,7 @@ let isMoveValid (state: WorldState) position (direction: Direction) =
 let perform (world: WorldState) (action: Action) =
     match action.Type with
     | Move dir -> 
-        let entity = world.Entities.[action.EntityId]
+        let entity = world.EntitiesById.[action.EntityId]
         match position entity with
         | None -> world
         | Some pos ->

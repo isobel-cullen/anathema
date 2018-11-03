@@ -14,6 +14,6 @@ let atPosition point =
     Position.coords >> Option.exists (fun p -> p = point)
 
 let entityAt (point: Point) (world: WorldState) =
-    world.Entities
+    world.EntitiesById
         |> Seq.tryFind (fun kv -> kv.Value |> atPosition point)
         |> Option.map (fun kv -> kv.Value)

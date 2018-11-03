@@ -60,7 +60,7 @@ type World (resumeFromState) =
                     let e = entity |> exhaust agency action
                     { state with
                         ActionQueue = state.ActionQueue.Enqueue action
-                        Entities = state.Entities.Add (e.Id, e)
+                        EntitiesById = state.EntitiesById.Add (e.Id, e)
                     } |> advance |> getActions
                 | _ -> state |> advance
             | true, true, Some pA ->
@@ -70,7 +70,7 @@ type World (resumeFromState) =
                 let e = entity |> exhaust agency actionWithId
                 { state with
                     ActionQueue = state.ActionQueue.Enqueue actionWithId
-                    Entities = state.Entities.Add (e.Id, e)
+                    EntitiesById = state.EntitiesById.Add (e.Id, e)
                 }
         | _ ->
             state |> advance |> getActions

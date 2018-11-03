@@ -20,7 +20,7 @@ type KeyActionChooser = Key -> Action option
 let (!!) (s: string) = ustring.Make s
 
 let getView (state : WorldState) =
-    state.Entities
+    state.EntitiesById
             |> Seq.filter (fun kv -> kv.Value.IsEnabled)
             |> Seq.map (fun kv -> kv.Value)
             |> Seq.choose (position)
